@@ -43,7 +43,7 @@ class CategoryItemOverview extends Component {
   }
 
   componentDidMount = _ => {
-    this._getData();
+    //this._getData();
   }
 
   render = _ => {
@@ -68,19 +68,7 @@ class CategoryItemOverview extends Component {
 }
 
 CategoryItemOverview.propTypes = {
-  id: PropTypes.string.isRequired,
-  categoryId: PropTypes.string.isRequired,
-  settings: PropTypes.object.isRequired,
-  fields: PropTypes.array.isRequired,
-  dialog: PropTypes.bool.isRequired,
-  closeDialog: PropTypes.func,
-  closeDialogRequired: (props, propName, componentName) => {
-    if (props.dialog && !props.closeDialog) {
-      return new Error(
-        `${propName} ${componentName}: An overview dialog must be a closeDialog function.`
-      );
-    }
-  },
+
 }
 
 CategoryItemOverview.defaultProps = {

@@ -13,28 +13,38 @@ class App extends Component {
   componentDidMount = _ => this.props.fetchCategories()
 
   render = _ => {
+    const { categories } = this.props;
+
     return (
       <div>
         <Drawer />
 
         <Route path="/" exact component={Dashboard} />
 
-        {/*<Route path="/:categoryName" component={props => {
+        <Route path="/:categoryName" component={props => {
           const categoryName = props.match.params.categoryName
-          return category ? 
-            React.createElement(Category, { 
-              categoryName: categoryName
-            }) : 
-            React.createElement(NotFound, {title: 'Category Not Found'})
-        }}/>*/}
+          const category = categories.find(category => category.name === categoryName)
+          return category ?
+            React.createElement(Category, { name: categoryName }) : 
+            React.createElement(NotFound, {text: 'Category Not Found'})
+        }}/>
       </div>
     )
   }
 
 }
 
+Dashboard.propTypes = {
+  categories: PropTypes.array.isRequired,
+  fetchCategories: PropTypes.func.isRequired
+}
+
+const mapStateToProps = ({categories}) => ({
+  categories: categories.items
+})
+
 const mapDispatchToProps = dispatch => ({
   fetchCategories: _ => dispatch(fetchCategories()),
 })
 
-export default connect(null, mapDispatchToProps)(App)
+export default connect(mapStateToProps, mapDispatchToProps)(App)

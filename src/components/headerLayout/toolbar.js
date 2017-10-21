@@ -12,28 +12,23 @@ import CircularProgress from 'material-ui/Progress/CircularProgress'
 
 const styles = theme => ({
   root: {
-    width: '-webkit-fill-available',
+    width: '-webkit-fill-available'
   },
   leftOperations: {
     order: 1,
     display: 'flex',
-    justifyContent: 'flex-start',
+    justifyContent: 'flex-start'
   },
   title: {
     order: 2,
+    height: '100%',
     display: 'flex',
     overflow: 'hidden',
-    marginRight: theme.spacing.unit*4,
-  },
-  loading: {
-    order: 3,
-    display: 'flex',
-    alignItems: 'center',
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit,
+    paddingRight: theme.spacing.unit*4,
+    position: 'relative'
   },
   search: {
-    order: 4,
+    order: 3,
     display: 'none',
     flex: 0,
     height: '100%',
@@ -41,39 +36,36 @@ const styles = theme => ({
       flex: 1,
       display: 'flex',
       justifyContent: 'center',
-      marginLeft: theme.spacing.unit*4,
-      marginRight: theme.spacing.unit*4,
-    },
+      marginLeft: theme.spacing.unit*6,
+      marginRight: theme.spacing.unit*4
+    }
   },
   rightOperations: {
-    order: 5,
+    order: 4,
     flex: 1,
     display: 'flex',
     justifyContent: 'flex-end',
     [theme.breakpoints.up('sm')]: {
-      flex: 0,
-    },
+      flex: 0
+    }
   },
   operations: {
-    display: 'flex',
+    display: 'flex'
   },
-  miniSearch: {
+  loading: {
     position: 'absolute',
-    left: theme.spacing.unit*2,
-    top: '50%',
-    transform: 'translate(0, -50%)',
-    width: '50%',
-    zIndex: 5,
-    [theme.breakpoints.up('sm')]: {
-      display: 'none',
-    },
+    top: 0,
+    right: 0,
+    display: 'flex',
+    alignItems: 'center',
+    marginLeft: theme.spacing.unit
   },
   titleText: {
     marginBottom: 2,
     textTransform: 'capitalize',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
+    whiteSpace: 'nowrap'
   },
   searchBar: {
     display: 'flex',
@@ -82,7 +74,7 @@ const styles = theme => ({
     alignItems: 'center',
     maxWidth: 520,
     background: theme.palette.primary[400],
-    width: '100%',
+    width: '100%'
   },
   searchBarSearchIcon: {
     position: 'absolute',
@@ -91,7 +83,7 @@ const styles = theme => ({
     transform: 'translate(0, -50%)',
     zIndex: 5,
     paddingLeft: theme.spacing.unit,
-    paddingRight: theme.spacing.unit,
+    paddingRight: theme.spacing.unit
   },
   searchBarInput: {
     flex: 1,
@@ -100,7 +92,7 @@ const styles = theme => ({
     fontSize: 16,
     background: 'transparent',
     paddingLeft: theme.spacing.unit*5,
-    paddingRight: theme.spacing.unit*4,
+    paddingRight: theme.spacing.unit*4
   },
   searchBarInputFocused: {
     background: theme.palette.primary[300],
@@ -116,13 +108,13 @@ const styles = theme => ({
     paddingRight: theme.spacing.unit,
     width: 20,
     height: 20,
-    cursor: 'pointer',
+    cursor: 'pointer'
   },
   searchOperation: {
     [theme.breakpoints.up('sm')]: {
-      display: 'none',
-    },
-  },
+      display: 'none'
+    }
+  }
 })
 
 let Operations = props => {
@@ -202,12 +194,11 @@ class CustomToolbar extends Component {
             >
               {title}
             </Typography>
-          </div>
-
-          <div className={classes.loading}>
-          {loading &&
-            <CircularProgress size={30} color="accent"/>
-          }
+            <div className={classes.loading}>
+              {loading &&
+                <CircularProgress size={20} color="accent"/>
+              }
+              </div>
           </div>
 
           <div

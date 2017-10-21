@@ -4,7 +4,7 @@ import HeaderLayout from '../headerLayout';
 import Close from 'material-ui-icons/Close';
 import Check from 'material-ui-icons/Check';
 
-class CategoryItemNew extends Component {
+class PostNew extends Component {
 
   _createItem = _ => {
     console.log("CREAR ITEM");
@@ -12,11 +12,11 @@ class CategoryItemNew extends Component {
   }
 
   render = _ => {
-    const { closeDialog, itemLabel } = this.props;
+    const { closeDialog } = this.props;
 
     return (
       <HeaderLayout
-        title={`Nuevo ${itemLabel}`} 
+        title="New Post" 
         operations={[
           {id:'close', icon:Close, onClick:closeDialog},
           {id:'check', icon:Check, right: true, onClick:this._createItem}
@@ -27,9 +27,8 @@ class CategoryItemNew extends Component {
   }
 }
 
-CategoryItemNew.propTypes = {
-  closeDialog: PropTypes.func.isRequired,
-  itemLabel: PropTypes.string,
+PostNew.propTypes = {
+  closeDialog: PropTypes.func.isRequired
 }
 
-export default CategoryItemNew;
+export default PostNew;
