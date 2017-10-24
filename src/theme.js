@@ -40,7 +40,11 @@ let theme = createMuiTheme({
           width: theme.standards.drawerWidth,
         },
       },
-
+      MuiSelect: {
+        select: {
+          textTransform: 'capitalize'
+        },
+      },
       MuiList: {
         padding: {
           paddingTop: 0,

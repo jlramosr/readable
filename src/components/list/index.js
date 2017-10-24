@@ -163,8 +163,8 @@ class CustomList extends Component {
           )
         )}
 
-        <Dialog fullScreen open={showNewDialog} onRequestClose={this._newDialogClosed}>
-          <PostNew closeDialog={this.closeNewDialog} category={category} />
+        <Dialog open={showNewDialog} onRequestClose={this._newDialogClosed}>
+          <PostNew closeDialog={this.closeNewDialog} categoryName={category} />
         </Dialog>
 
       </HeaderLayout>

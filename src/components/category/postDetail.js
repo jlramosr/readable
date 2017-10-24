@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import HeaderLayout from '../headerLayout'
 import { withStyles } from 'material-ui/styles'
+import{ MenuItem } from 'material-ui/Menu'
 import TextField from 'material-ui/TextField'
 import ArrowBack from 'material-ui-icons/ArrowBack'
 import Check from 'material-ui-icons/Check'
@@ -15,16 +16,17 @@ const styles = theme => ({
     flexWrap: 'wrap',
     paddingLeft: theme.spacing.unit*4,
     paddingRight: theme.spacing.unit*4,
+    paddingTop: theme.spacing.unit,
+    paddingBottom: theme.spacing.unit,
   },
   textField: {
     marginLeft: theme.spacing.unit,
     marginRight: theme.spacing.unit
   }
-});
+})
 
 class PostDetail extends Component {
   state = {
-    title: '',
     editMode: false
   }
 
@@ -44,18 +46,16 @@ class PostDetail extends Component {
   }
 
   _changeEditMode = editMode => {
-    console.log("EDIT MODE", editMode)
     this.setState({editMode})
   }
 
   componentWillReceiveProps = props => {
-    const { title } = props.post
-    this.setState({title})
+    this.setState({...props.post})
   }
 
   render = _ => {
-    const { categoryName, post, isFetchingPosts, classes } = this.props
-    const { title, editMode } = this.state
+    const { categoryName, categories, post, isFetchingPosts, classes } = this.props
+    const { editMode, ...values } = this.state
 
     return (
       <HeaderLayout
@@ -63,22 +63,66 @@ class PostDetail extends Component {
         loading={isFetchingPosts}
         operations={[
           {id:'arrowBack', icon:ArrowBack, to:`/${categoryName}`},
-          {id:'check', icon:Check, right: true, onClick:this._updateItem},
-          {id:'edit', icon:Edit, right: true, onClick: _ => this._changeEditMode(true)},
-          {id:'delete', icon:Delete, right: true, onClick:this._deleteItem},
+          {id:'check', icon:Check, hidden:!editMode, right: true, onClick:this._updateItem},
+          {id:'edit', icon:Edit, hidden:editMode, right: true, onClick: _ => this._changeEditMode(true)},
+          {id:'delete', icon:Delete, hidden:editMode, right: true, onClick:this._deleteItem},
         ]}
       >
         <form className={classes.container} noValidate autoComplete="off">
           <TextField
+            disabled={!editMode}
             fullWidth
             id="title"
             label="Title"
             InputLabelProps={{shrink: true}}
             className={classes.textField}
-            value={title}
+            value={values.title}
             onChange={this._handleChange('title')}
-            margin="normal"
+            margin="dense"
           />
+          <TextField
+            disabled={!editMode}
+            fullWidth
+            id="body"
+            label="Body"
+            InputLabelProps={{shrink: true}}
+            multiline
+            rows="14"
+            rowsMax="14"
+            value={values.body}
+            onChange={this._handleChange('body')}
+            className={classes.textField}
+            margin="dense"
+          />
+          <TextField
+            disabled={!editMode}
+            fullWidth
+            id="author"
+            label="Author"
+            InputLabelProps={{shrink: true}}
+            className={classes.textField}
+            value={values.author}
+            onChange={this._handleChange('author')}
+            margin="dense"
+          />
+          <TextField
+            disabled={!editMode}
+            fullWidth
+            id="category"
+            select
+            label="Category"
+            className={classes.textField}
+            value={values.category}
+            onChange={this._handleChange('category')}
+            SelectProps={{native: true}}
+            margin="dense"
+          >
+            {categories.map(category => (
+              <option key={category} value={category}>
+                <span>{category}</span>
+              </option>
+            ))}
+          </TextField>
         </form>
       </HeaderLayout>
     )
@@ -91,14 +135,17 @@ PostDetail.propTypes = {
       postId: PropTypes.string.isRequired
     })
   }),
-  categoryName: PropTypes.string.isRequired,
   post: PropTypes.object.isRequired,
+  categoryName: PropTypes.string.isRequired,
+  categories: PropTypes.array.isRequired,
   classes: PropTypes.object.isRequired
 }
 
-const mapStateToProps = ({ posts }, ownProps) => ({ 
-  post: (posts.items[ownProps.match.params.categoryName] || [])
-    .find(post => post.id === ownProps.match.params.postId) || {},
+const mapStateToProps = ({ posts, categories }, ownProps) => ({ 
+  post: (posts.items[ownProps.categoryName] || []).find(post => 
+    post.id === ownProps.match.params.postId
+  ) || {},
+  categories: categories.items.map(category => category.name),
   isFetchingPosts: posts.isFetching
 })
 
