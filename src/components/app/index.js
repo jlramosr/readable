@@ -1,50 +1,35 @@
 import React, { Component } from 'react'
-import { Route } from 'react-router'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { fetchCategories } from '../../actions/categories'
-import Dashboard from '../dashboard'
+import { fetchPosts } from '../../actions/posts'
+import { renderRoutes } from 'react-router-config'
 import Drawer from '../drawer'
-import Category from '../category'
-import NotFound from '../notFound'
 
 class App extends Component {
 
-  componentDidMount = _ => this.props.fetchCategories()
-
-  render = _ => {
-    const { categories } = this.props;
-
-    return (
-      <div>
-        <Drawer />
-
-        <Route path="/" exact component={Dashboard} />
-
-        <Route path="/:categoryName" component={props => {
-          const categoryName = props.match.params.categoryName
-          const category = categories.find(category => category.name === categoryName)
-          return category ?
-            React.createElement(Category, { name: categoryName }) : 
-            React.createElement(NotFound, {text: 'Category Not Found'})
-        }}/>
-      </div>
-    )
+  componentDidMount = _ => {
+    this.props.fetchCategories()
+    this.props.fetchPosts()
   }
+  
+  render = _ => (
+    <div>
+      <Drawer />
+      {renderRoutes(this.props.route.routes)}
+    </div>
+  )
 
 }
 
-Dashboard.propTypes = {
-  categories: PropTypes.array.isRequired,
-  fetchCategories: PropTypes.func.isRequired
+App.propTypes = {
+  fetchCategories: PropTypes.func.isRequired,
+  fetchPosts: PropTypes.func.isRequired
 }
-
-const mapStateToProps = ({categories}) => ({
-  categories: categories.items
-})
 
 const mapDispatchToProps = dispatch => ({
   fetchCategories: _ => dispatch(fetchCategories()),
+  fetchPosts: _ => dispatch(fetchPosts())
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(App)
+export default connect(null, mapDispatchToProps)(App)

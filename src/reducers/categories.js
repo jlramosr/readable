@@ -1,9 +1,9 @@
-import { snapshotToArray } from '../utils/helpers'
 import { REQUEST_CATEGORIES } from '../actions/categories'
 import { RECEIVE_CATEGORIES } from '../actions/categories'
 
 const initialCategoriesState = {
   isFetching: false,
+  received: false,
   items: []
 }
 
@@ -18,7 +18,8 @@ const categories = (state = initialCategoriesState, action) => {
       return {
         ...state,
         isFetching: false,
-        items: snapshotToArray(action.items),
+        received: true,
+        items: [...action.items],
       }
     default:
       return state

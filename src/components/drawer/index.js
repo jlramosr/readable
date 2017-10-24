@@ -41,16 +41,14 @@ class CustomDrawer extends Component {
 
 CustomDrawer.propTypes = {
   categories: PropTypes.array.isRequired,
-  opened: PropTypes.bool.isRequired
+  opened: PropTypes.bool.isRequired,
+  close: PropTypes.func.isRequired,
 }
 
-const mapStateToProps = (state) => {
-  const { categories, drawer } = state;
-  return {
-    categories: [...categories.items],
-    opened: drawer.opened
-  }
-}
+const mapStateToProps = ({ categories, drawer }) => ({
+  categories: categories.items,
+  opened: drawer.opened
+})
 
 const mapDispatchToProps = dispatch => ({
   close: _ => dispatch(toggleDrawer(false)),

@@ -3,6 +3,7 @@ import { RECEIVE_POSTS } from '../actions/posts'
 
 const initialPostsState = {
   isFetching: false,
+  received: false,
   items: []
 }
 
@@ -17,6 +18,7 @@ const posts = (state = initialPostsState, action) => {
       return {
         ...state,
         isFetching: false,
+        received: true,
         items: action.items.reduce((acc, post) => (
           {...acc, [post.category]: [...acc[post.category] || [], post]}
         ),{})

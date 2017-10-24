@@ -7,10 +7,10 @@ import grey from 'material-ui/colors/grey'
 let theme = createMuiTheme({
     standards: {
       colors: {
-        primary: indigo,
-        secondary: amber,
+        primary: grey,
+        secondary: indigo,
         error: red,
-        grey: grey
+        grey: amber
       },
       toolbarHeights: {
         mobilePortrait: 56,

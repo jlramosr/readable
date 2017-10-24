@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { fetchPosts } from '../../actions/posts'
 import { toggleDrawer } from '../../actions/drawer'
 import HeaderLayout from '../headerLayout'
 import PostNew from '../category/postNew'
@@ -36,7 +35,7 @@ class Dashboard extends Component {
     showingPosts: [],
     searchQuery: '',
     showNewDialog: false,
-    orderBy: 'voteScore',
+    orderBy: 'timestamp',
     orderDesc: false
   }
 
@@ -85,11 +84,11 @@ class Dashboard extends Component {
     this.setState({showingPosts: this._orderPosts(props.posts, orderBy, orderDesc)})
   }
 
-  componentDidMount = _ => this.props.fetchPosts()
-
   render = _ => {
     const { showingPosts, showNewDialog, orderBy, orderDesc } = this.state
     const { isFetchingCategories, isFetchingPosts, drawerOpened, toggleDrawer, classes } = this.props
+
+    console.log("RENDER DASHBOARD", this.props);
 
     let subHeader = 'Posts'
     if (orderBy === 'timestamp') {
@@ -173,21 +172,17 @@ Dashboard.propTypes = {
   classes: PropTypes.object.isRequired
 }
 
-const mapStateToProps = (state) => {
-  const { categories, posts, drawer } = state
-  return {
-    posts: Object.keys(posts.items).reduce((acc, categoryId) => (
-      [...acc, ...posts.items[categoryId]]), []
-    ),
-    isFetchingPosts: posts.isFetching,
-    isFetchingCategories: categories.isFetching,
-    drawerOpened: drawer.opened
-  }
-}
+const mapStateToProps = ({ categories, posts, drawer }) => ({ 
+  posts: Object.keys(posts.items).reduce((acc, categoryId) => (
+    [...acc, ...posts.items[categoryId]]), []
+  ),
+  isFetchingPosts: posts.isFetching,
+  isFetchingCategories: categories.isFetching,
+  drawerOpened: drawer.opened,
+})
 
 const mapDispatchToProps = dispatch => ({
-  toggleDrawer: opened => dispatch(toggleDrawer(opened)),
-  fetchPosts: _ => dispatch(fetchPosts()),
+  toggleDrawer: opened => dispatch(toggleDrawer(opened))
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(
