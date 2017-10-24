@@ -123,16 +123,7 @@ let Operations = props => {
   return (
     <div className={classes.operations}>
     {operations.map(operation => 
-      <Operation
-        key={operation.id}
-        id={operation.id}
-        color={operation.color}
-        icon={operation.icon}
-        hidden={operation.hidden}
-        to={operation.to}
-        description={operation.description}
-        onClick={operation.onClick}
-      />
+      <Operation key={operation.id} {...operation} />
     )}
     </div>
   )

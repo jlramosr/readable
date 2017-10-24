@@ -1,6 +1,7 @@
 import { createStore, applyMiddleware, combineReducers, compose } from 'redux'
 import { routerReducer, routerMiddleware } from 'react-router-redux'
 import thunk from 'redux-thunk'
+import logger from 'redux-logger'
 import categoriesReducer from './reducers/categories'
 import postsReducer from './reducers/posts'
 import drawerReducer from './reducers/drawer'
@@ -15,7 +16,6 @@ export default createStore(
     drawer: drawerReducer,
   }),
   composeEnhancers(
-    applyMiddleware(thunk),
-    applyMiddleware(routerMiddleware(history))
+    applyMiddleware(thunk, logger, routerMiddleware(history))
   )
 )

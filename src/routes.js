@@ -4,7 +4,7 @@ import Category from './components/category'
 import PostsList from './components/category/postsList'
 import PostDetail from './components/category/postDetail'
 
-export default [{ 
+export default [{
   component: App,
   exact: true,
   routes: [

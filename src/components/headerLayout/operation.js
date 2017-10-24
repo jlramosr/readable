@@ -7,7 +7,6 @@ import Tooltip from 'material-ui/Tooltip'
 const Operation = props => {
   const { id, icon, color, hidden, to, description, onClick } = props
   const Icon = icon
-
   return (
     <div hidden={hidden}>
     {to ? (
@@ -18,7 +17,7 @@ const Operation = props => {
       </Link> 
     ) : (
       description ? (
-        <Tooltip title={description} placement="bottom" enterDelay={200}>
+        <Tooltip title={description} enterDelay={200}>
           <IconButton color={color} style={{cursor: onClick ? 'pointer' : 'default'}}>
             <Icon aria-label={id} onClick={onClick}/>
           </IconButton>

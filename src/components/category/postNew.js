@@ -12,23 +12,25 @@ class PostNew extends Component {
   }
 
   render = _ => {
-    const { closeDialog } = this.props;
+    const { closeDialog, category } = this.props;
 
     return (
       <HeaderLayout
-        title="New Post" 
+        title={`New ${category || ''} Post`}
         operations={[
           {id:'close', icon:Close, onClick:closeDialog},
           {id:'check', icon:Check, right: true, onClick:this._createItem}
         ]}
       >
+        new
       </HeaderLayout>
     );
   }
 }
 
 PostNew.propTypes = {
-  closeDialog: PropTypes.func.isRequired
+  closeDialog: PropTypes.func.isRequired,
+  category: PropTypes.string
 }
 
 export default PostNew;

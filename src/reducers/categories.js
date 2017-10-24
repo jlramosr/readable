@@ -19,7 +19,7 @@ const categories = (state = initialCategoriesState, action) => {
         ...state,
         isFetching: false,
         received: true,
-        items: [...action.items],
+        items: action.items,
       }
     default:
       return state
