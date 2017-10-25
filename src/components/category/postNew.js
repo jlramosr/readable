@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import HeaderLayout from '../headerLayout'
+import { demandAddPost } from '../../actions/posts'
 import { withStyles } from 'material-ui/styles'
 import TextField from 'material-ui/TextField'
 import Close from 'material-ui-icons/Close'
@@ -22,48 +23,110 @@ const styles = theme => ({
   }
 })
 
+const requiredFields = [
+  'title',
+  'body',
+  'author',
+  'category'
+]
+
 class PostNew extends Component {
   state = {
-    values: {},
-    editMode: false
+    submitting: false,
+    values: {}
   }
 
-  _handleChange = name => event => {
-    this.setState({
-      [name]: event.target.value
-    })
+
+  _handleChange = (name, value) =>
+    this.setState(prevState => ({
+    ...prevState,
+    values: {
+      ...prevState.values,
+      [name]: value
+    }
+  }))
+
+  _submit = _ => {
+    this.setState(prevState => ({
+      submitting: true,
+      values: {
+        ...prevState.values, 
+        category: this.props.categoryName || prevState.values.category
+      }
+    }))
+    if (requiredFields.reduce((acc,field) => acc && this.state.values[field], true)) {
+      this._createItem()
+    }
   }
 
   _createItem = _ => {
-    this.props.closeDialog()
+    this.props.demandAddPost(this.state.values).then(_ => this.props.closeDialog())
   }
 
   render = _ => {
-    const { closeDialog, category, categories, classes } = this.props
-    const { ...values } = this.state
+    const { closeDialog, categoryName, categories, isAdding, classes } = this.props
+    const { submitting, values } = this.state
 
     return (
       <HeaderLayout
-        title={`New ${category || ''} Post`}
-        relative
+        title={`New ${categoryName || ''} Post`}
+        loading={isAdding}
         operations={[
           {id:'close', icon:Close, onClick:closeDialog},
-          {id:'check', icon:Check, right: true, onClick:this._createItem}
+          {id:'check', icon:Check, right:true, onClick:this._submit}
         ]}
       >
-        <form className={classes.container} noValidate autoComplete="off">
+        <form className={classes.container}>
           <TextField
             fullWidth
+            required={requiredFields.includes('title')}
+            error={submitting && !values.title}
             id="title"
             label="Title"
             InputLabelProps={{shrink: true}}
             className={classes.textField}
             value={values.title}
-            onChange={this._handleChange('title')}
+            onChange={event => this._handleChange('title', event.target.value)}
             margin="normal"
           />
           <TextField
             fullWidth
+            required={requiredFields.includes('author')}
+            error={submitting && !values.author}
+            id="author"
+            label="Author"
+            InputLabelProps={{shrink: true}}
+            className={classes.textField}
+            value={values.author}
+            onChange={event => this._handleChange('author', event.target.value)}
+            margin="normal"
+          />
+          <TextField
+            fullWidth
+            required={requiredFields.includes('category')}
+            style={{display: Boolean(categoryName) ? 'none' : 'flex'}}
+            error={submitting && !values.category}
+            id="category"
+            select
+            label="Category"
+            InputLabelProps={{shrink: true}}
+            className={classes.textField}
+            value={values.category}
+            onChange={event => this._handleChange('category', event.target.value)}
+            SelectProps={{native: true}}
+            margin="normal"
+          >
+            <option value=""></option>
+            {categories.map(category => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </TextField>
+          <TextField
+            fullWidth
+            required={requiredFields.includes('body')}
+            error={submitting && !values.body}
             id="body"
             label="Body"
             InputLabelProps={{shrink: true}}
@@ -71,39 +134,10 @@ class PostNew extends Component {
             rows="14"
             rowsMax="14"
             value={values.body}
-            onChange={this._handleChange('body')}
+            onChange={event => this._handleChange('body', event.target.value)}
             className={classes.textField}
             margin="normal"
           />
-          <TextField
-            fullWidth
-            id="author"
-            label="Author"
-            InputLabelProps={{shrink: true}}
-            className={classes.textField}
-            value={values.author}
-            onChange={this._handleChange('author')}
-            margin="normal"
-          />
-          <TextField
-            fullWidth
-            id="category"
-            select
-            label="Category"
-            InputLabelProps={{shrink: true}}
-            className={classes.textField}
-            value={values.category}
-            onChange={this._handleChange('category')}
-            SelectProps={{native: true}}
-            margin="normal"
-          >
-            <option value="none"></option>
-            {categories.map(category => (
-              <option key={category} value={category}>
-                <span>{category}</span>
-              </option>
-            ))}
-          </TextField>
         </form>
       </HeaderLayout>
     )
@@ -112,11 +146,17 @@ class PostNew extends Component {
 
 PostNew.propTypes = {
   closeDialog: PropTypes.func.isRequired,
-  category: PropTypes.string
+  categoryName: PropTypes.string,
+  isAdding: PropTypes.bool.isRequired
 }
 
 const mapStateToProps = ({ posts, categories }, ownProps) => ({ 
   categories: categories.items.map(category => category.name),
+  isAdding: posts.isAdding
 })
 
-export default connect(mapStateToProps)(withStyles(styles)(PostNew))
+const mapDispatchToProps = dispatch => ({
+  demandAddPost: post => dispatch(demandAddPost(post))
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(PostNew))

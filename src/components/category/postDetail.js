@@ -9,6 +9,7 @@ import ArrowBack from 'material-ui-icons/ArrowBack'
 import Check from 'material-ui-icons/Check'
 import Edit from 'material-ui-icons/Edit'
 import Delete from 'material-ui-icons/Delete'
+import { timestampToHuman } from '../../utils/helpers'
 
 const styles = theme => ({
   container: {
@@ -22,12 +23,46 @@ const styles = theme => ({
   textField: {
     marginLeft: theme.spacing.unit,
     marginRight: theme.spacing.unit
+  },
+  viewContainer: {
+    padding: theme.spacing.unit*4,
+    display: 'flex',
+    flexDirection: 'column'
+  },
+  viewHeader: {
+    marginBottom: theme.spacing.unit*2,
+    padding: theme.spacing.unit,
+    flex: '0 1 auto',
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  viewBody: {
+    order: 2,
+    padding: theme.spacing.unit,
+    display: 'flex',
+    flex: '1 1 auto'
+  },
+  viewAuthor: {
+    color: theme.palette.secondary[700],
+    textTransform: 'capitalize',
+    flex: '1 1 auto',
+    alignSelf: 'flex-start',
+    marginRight: theme.spacing.unit,
+  },
+  viewDate: {
+    color: theme.palette.secondary[700],
+    flex: '0 1 auto',
+    alignSelf: 'flex-end'
   }
 })
 
 class PostDetail extends Component {
   state = {
-    editMode: false
+    editMode: false,
+    submitting: false,
+    values: {
+
+    }
   }
 
   _handleChange = name => event => {
@@ -50,12 +85,12 @@ class PostDetail extends Component {
   }
 
   componentWillReceiveProps = props => {
-    this.setState({...props.post})
+    this.setState({values: {...props.post}})
   }
 
   render = _ => {
     const { categoryName, categories, post, isFetchingPosts, classes } = this.props
-    const { editMode, ...values } = this.state
+    const { editMode, submitting, values } = this.state
 
     return (
       <HeaderLayout
@@ -68,9 +103,9 @@ class PostDetail extends Component {
           {id:'delete', icon:Delete, hidden:editMode, right: true, onClick:this._deleteItem},
         ]}
       >
+      {editMode ? (
         <form className={classes.container} noValidate autoComplete="off">
           <TextField
-            disabled={!editMode}
             fullWidth
             id="title"
             label="Title"
@@ -81,21 +116,6 @@ class PostDetail extends Component {
             margin="dense"
           />
           <TextField
-            disabled={!editMode}
-            fullWidth
-            id="body"
-            label="Body"
-            InputLabelProps={{shrink: true}}
-            multiline
-            rows="14"
-            rowsMax="14"
-            value={values.body}
-            onChange={this._handleChange('body')}
-            className={classes.textField}
-            margin="dense"
-          />
-          <TextField
-            disabled={!editMode}
             fullWidth
             id="author"
             label="Author"
@@ -106,7 +126,6 @@ class PostDetail extends Component {
             margin="dense"
           />
           <TextField
-            disabled={!editMode}
             fullWidth
             id="category"
             select
@@ -119,11 +138,35 @@ class PostDetail extends Component {
           >
             {categories.map(category => (
               <option key={category} value={category}>
-                <span>{category}</span>
+                {category}
               </option>
             ))}
           </TextField>
+          <TextField
+            fullWidth
+            id="body"
+            label="Body"
+            InputLabelProps={{shrink: true}}
+            multiline
+            rows="14"
+            rowsMax="14"
+            value={values.body}
+            onChange={this._handleChange('body')}
+            className={classes.textField}
+            margin="dense"
+          />
         </form>
+      ) : (
+        <div className={classes.viewContainer}>
+          <div className={classes.viewHeader}>
+            <div className={classes.viewAuthor}>{`by ${post.author}, in ${post.category} category`}</div>
+            <div className={classes.viewDate}>{timestampToHuman(post.timestamp)}</div>
+          </div>
+          <div className={classes.viewBody}>
+            {values.body}
+          </div>
+        </div>
+      )}
       </HeaderLayout>
     )
   }

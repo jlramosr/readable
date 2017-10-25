@@ -13,9 +13,9 @@ export default createStore(
     router: routerReducer,
     categories: categoriesReducer,
     posts: postsReducer,
-    drawer: drawerReducer,
+    drawer: drawerReducer
   }),
   composeEnhancers(
-    applyMiddleware(thunk, logger, routerMiddleware(history))
+    applyMiddleware(thunk, routerMiddleware(history))
   )
 )

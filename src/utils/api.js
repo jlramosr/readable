@@ -10,23 +10,18 @@ const headers = {
   'Authorization': token
 }
 
-export const getAllCategories = _ =>
+export const getAPICategories = _ =>
   fetch(`${api}/categories`, { headers })
     .then(res => res.json())
     .then(data => data.categories)
 
-export const getAllPosts = _ =>
+export const getAPIPosts = _ =>
   fetch(`${api}/posts`, { headers })
     .then(res => res.json())
     .then(data => data)
 
-export const remove = (contact) =>
-  fetch(`${api}/contacts/${contact.id}`, { method: 'DELETE', headers })
-    .then(res => res.json())
-    .then(data => data.contact)
-
-export const create = (body) =>
-  fetch(`${api}/contacts`, {
+export const addAPIPost = (body) =>
+  fetch(`${api}/posts`, {
     method: 'POST',
     headers: {
       ...headers,
@@ -34,3 +29,8 @@ export const create = (body) =>
     },
     body: JSON.stringify(body)
   }).then(res => res.json())
+
+export const remove = (contact) =>
+  fetch(`${api}/contacts/${contact.id}`, { method: 'DELETE', headers })
+    .then(res => res.json())
+    .then(data => data.contact)

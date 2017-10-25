@@ -15,8 +15,11 @@ import SortByAlpha from 'material-ui-icons/SortByAlpha'
 import DateRange from 'material-ui-icons/DateRange'
 import Favorite from 'material-ui-icons/Favorite'
 import Add from 'material-ui-icons/Add'
+import Slide from 'material-ui/transitions/Slide'
 import escapeRegExp from 'escape-string-regexp'
+import sortBy from "sort-by"
 import removeDiacritics from 'remove-diacritics'
+import { timestampToHuman } from '../../utils/helpers'
 
 const styles = theme => ({
   root: {
@@ -48,10 +51,8 @@ class CustomList extends Component {
   
   closeNewDialog = _ => this.setState({ showNewDialog: false})
 
-  _orderPosts = (posts, orderBy, orderDesc) => {
-    
-    return posts.sort((a,b) => orderDesc ? (b[orderBy] <= a[orderBy]) : (b[orderBy] > a[orderBy]))
-  }
+  _orderPosts = (posts, orderBy, orderDesc) =>
+    posts.sort(sortBy(`${orderDesc ? '' : '-'}${orderBy}`))
 
   updateSearchQuery = searchQuery => {
     const { posts } = this.props
@@ -141,7 +142,7 @@ class CustomList extends Component {
                     <ListItem button> 
                       <ListItemText
                         primary={post.title}
-                        secondary={`${new Date(post.timestamp).toLocaleString('en-US')}, by ${post.author}`}
+                        secondary={`${timestampToHuman(post.timestamp)}, by ${post.author}`}
                       />
                       <ListItemSecondaryAction>
                         <IconButton aria-label="Votes">
@@ -163,7 +164,12 @@ class CustomList extends Component {
           )
         )}
 
-        <Dialog open={showNewDialog} onRequestClose={this._newDialogClosed}>
+        <Dialog
+          fullScreen
+          open={showNewDialog}
+          onRequestClose={this._newDialogClosed}
+          transition={<Slide direction="up" />}
+        >
           <PostNew closeDialog={this.closeNewDialog} categoryName={category} />
         </Dialog>
 
