@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { toggleDrawer } from '../../actions/drawer'
-import List from '../list'
+import List from '../list/posts'
 import MenuIcon from 'material-ui-icons/Menu'
 
 class Dashboard extends Component {
@@ -33,10 +33,17 @@ Dashboard.propTypes = {
   postsReceived: PropTypes.bool.isRequired
 }
 
+const _getAllPosts = posts =>
+  Object.keys(posts).reduce( (accCats, categoryName) => {
+    const categoryPosts = posts[categoryName]
+    const arrayCategoryPosts = Object.keys(categoryPosts).reduce( (accPosts, postId) => (
+      [...accPosts, {id:postId, ...categoryPosts[postId]}]
+    ), [])
+    return [...accCats, ...arrayCategoryPosts]
+  }, [])
+
 const mapStateToProps = ({ categories, posts, drawer }) => ({ 
-  posts: Object.keys(posts.items).reduce((acc, categoryId) => (
-    [...acc, ...posts.items[categoryId]]), []
-  ),
+  posts: _getAllPosts(posts.items).filter(post => !post.deleted),
   isFetchingPosts: posts.isFetching,
   postsReceived: posts.received,
   drawerOpened: drawer.opened

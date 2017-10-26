@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import HeaderLayout from '../headerLayout'
-import { demandAddPost } from '../../actions/posts'
+import { requestAddPost } from '../../actions/posts'
 import { withStyles } from 'material-ui/styles'
 import TextField from 'material-ui/TextField'
 import Close from 'material-ui-icons/Close'
@@ -59,18 +59,17 @@ class PostNew extends Component {
     }
   }
 
-  _createItem = _ => {
-    this.props.demandAddPost(this.state.values).then(_ => this.props.closeDialog())
-  }
+  _createItem = _ =>
+    this.props.requestAddPost(this.state.values).then( _ => this.props.closeDialog())
 
   render = _ => {
-    const { closeDialog, categoryName, categories, isAdding, classes } = this.props
+    const { closeDialog, categoryName, categories, isUpdating, classes } = this.props
     const { submitting, values } = this.state
 
     return (
       <HeaderLayout
         title={`New ${categoryName || ''} Post`}
-        loading={isAdding}
+        loading={isUpdating}
         operations={[
           {id:'close', icon:Close, onClick:closeDialog},
           {id:'check', icon:Check, right:true, onClick:this._submit}
@@ -147,16 +146,16 @@ class PostNew extends Component {
 PostNew.propTypes = {
   closeDialog: PropTypes.func.isRequired,
   categoryName: PropTypes.string,
-  isAdding: PropTypes.bool.isRequired
+  isUpdating: PropTypes.bool.isRequired
 }
 
 const mapStateToProps = ({ posts, categories }, ownProps) => ({ 
   categories: categories.items.map(category => category.name),
-  isAdding: posts.isAdding
+  isUpdating: posts.isUpdating
 })
 
 const mapDispatchToProps = dispatch => ({
-  demandAddPost: post => dispatch(demandAddPost(post))
+  requestAddPost: post => dispatch(requestAddPost(post))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(PostNew))

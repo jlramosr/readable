@@ -1,6 +1,7 @@
 {
   "name": "readable",
   "version": "0.2.1",
+  "author": "Jose Ramos <jlramosr@gmail.com> (http://joseramos.info)",
   "private": true,
   "dependencies": {
     "escape-string-regexp": "^1.0.5",

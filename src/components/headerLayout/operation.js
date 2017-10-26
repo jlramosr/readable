@@ -17,7 +17,14 @@ const Operation = props => {
       </Link> 
     ) : (
       description ? (
-        <Tooltip title={description} enterDelay={200}>
+        <Tooltip
+          title={description}
+          placement="left"
+          disableTriggerTouch
+          disableTriggerFocus
+          enterDelay={1000}
+          leaveDelay={0}
+        >
           <IconButton color={color} style={{cursor: onClick ? 'pointer' : 'default'}}>
             <Icon aria-label={id} onClick={onClick}/>
           </IconButton>

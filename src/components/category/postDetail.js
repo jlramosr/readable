@@ -3,16 +3,30 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import HeaderLayout from '../headerLayout'
 import { withStyles } from 'material-ui/styles'
-import{ MenuItem } from 'material-ui/Menu'
 import TextField from 'material-ui/TextField'
+import Badge from 'material-ui/Badge'
+import IconButton from 'material-ui/IconButton'
+import Stars from 'material-ui-icons/Stars'
+import Close from 'material-ui-icons/Close'
 import ArrowBack from 'material-ui-icons/ArrowBack'
+import ThumbUp from 'material-ui-icons/ThumbUp'
+import ThumbDown from 'material-ui-icons/ThumbDown'
 import Check from 'material-ui-icons/Check'
 import Edit from 'material-ui-icons/Edit'
 import Delete from 'material-ui-icons/Delete'
-import { timestampToHuman } from '../../utils/helpers'
+import {
+  requestUpdatePost,
+  requestDeletePost,
+  requestIncrementVoteScore,
+  requestDecrementVoteScore
+} from '../../actions/posts'
+import Button from 'material-ui/Button'
+import Dialog, { DialogActions, DialogContent, DialogContentText } from 'material-ui/Dialog'
+import Slide from 'material-ui/transitions/Slide'
+import { timestampToHuman, capitalize } from '../../utils/helpers'
 
 const styles = theme => ({
-  container: {
+  formContainer: {
     display: 'flex',
     flexWrap: 'wrap',
     paddingLeft: theme.spacing.unit*4,
@@ -25,9 +39,12 @@ const styles = theme => ({
     marginRight: theme.spacing.unit
   },
   viewContainer: {
-    padding: theme.spacing.unit*4,
     display: 'flex',
-    flexDirection: 'column'
+    flexDirection: 'column',
+    paddingLeft: theme.spacing.unit*4,
+    paddingRight: theme.spacing.unit*4,
+    paddingTop: theme.spacing.unit,
+    paddingBottom: theme.spacing.unit
   },
   viewHeader: {
     marginBottom: theme.spacing.unit*2,
@@ -35,6 +52,7 @@ const styles = theme => ({
     flex: '0 1 auto',
     display: 'flex',
     flexDirection: 'row',
+    fontSize: 10
   },
   viewBody: {
     order: 2,
@@ -42,43 +60,80 @@ const styles = theme => ({
     display: 'flex',
     flex: '1 1 auto'
   },
-  viewAuthor: {
+  viewInfo: {
     color: theme.palette.secondary[700],
-    textTransform: 'capitalize',
     flex: '1 1 auto',
-    alignSelf: 'flex-start',
-    marginRight: theme.spacing.unit,
+    display: 'flex',
+    flexDirection: 'row',
+    alignSelf: 'center',
+    marginRight: theme.spacing.unit
+  },
+  iconButton: {
+    cursor: 'initial',
+    width: theme.spacing.unit,
+    alignSelf: 'center',
+    marginRight: theme.spacing.unit*3,
+    top: theme.spacing.unit/2
+  },
+  viewAuthor: {
+    alignSelf: 'center',
+    flex: '1 1 auto'
   },
   viewDate: {
     color: theme.palette.secondary[700],
     flex: '0 1 auto',
-    alignSelf: 'flex-end'
+    alignSelf: 'center'
   }
 })
+
+const requiredFields = [
+  'title',
+  'body'
+]
 
 class PostDetail extends Component {
   state = {
     editMode: false,
     submitting: false,
-    values: {
+    showDeleteDialog: false,
+    values: {}
+  }
 
+  _handleChange = (name, value) =>
+    this.setState(prevState => ({
+    ...prevState,
+    values: {
+      ...prevState.values,
+      [name]: value
+    }
+  }))
+
+  _submit = _ => {
+    this.setState({submitting: true})
+    if (requiredFields.reduce((acc,field) => acc && this.state.values[field], true)) {
+      this._updatePost()
     }
   }
 
-  _handleChange = name => event => {
-    this.setState({
-      [name]: event.target.value
-    })
+  _updatePost = _ => {
+    const { title, body } = this.state.values
+    this.props.requestUpdatePost({title, body}).then( _ =>
+      this.setState({submitting: false, editMode: false, values: {...this.props.post}})
+    )
   }
 
-  _updateItem = _ => {
-    console.log("UPDATE ITEM", this.state.item)
-    this._changeEditMode(false)
+  _openDeleteDialog = () => {
+    this.setState({showDeleteDialog: true})
   }
 
-  _deleteItem = _ => {
-    console.log("DELETE ITEM", this.state.item)
+  _closeDeleteDialog = () => {
+    this.setState({showDeleteDialog: false})
   }
+
+  _deletePost = _ =>
+    this.props.requestDeletePost().then( _ =>
+      this.props.history.push(`/${this.props.categoryName}`)
+    )
 
   _changeEditMode = editMode => {
     this.setState({editMode})
@@ -89,61 +144,68 @@ class PostDetail extends Component {
   }
 
   render = _ => {
-    const { categoryName, categories, post, isFetchingPosts, classes } = this.props
+    const {
+      categoryName,
+      post,
+      isFetchingPosts,
+      isUpdatingPosts,
+      requestIncrementVoteScore,
+      requestDecrementVoteScore,
+      classes
+    } = this.props
     const { editMode, submitting, values } = this.state
 
     return (
       <HeaderLayout
         title={post.title}
-        loading={isFetchingPosts}
+        loading={isFetchingPosts || isUpdatingPosts}
         operations={[
-          {id:'arrowBack', icon:ArrowBack, to:`/${categoryName}`},
-          {id:'check', icon:Check, hidden:!editMode, right: true, onClick:this._updateItem},
-          {id:'edit', icon:Edit, hidden:editMode, right: true, onClick: _ => this._changeEditMode(true)},
-          {id:'delete', icon:Delete, hidden:editMode, right: true, onClick:this._deleteItem},
+          {
+            id:'arrowBack', icon:ArrowBack, hidden:editMode, to:`/${categoryName}`
+          },
+          {
+            id:'close', icon:Close, hidden:!editMode, onClick: _ => this._changeEditMode(false)
+          },
+          {
+            id:'check', icon:Check, description: 'Save', hidden:!editMode, 
+            right:true, onClick:this._submit
+          },
+          {
+            id:'thumbUp', icon:ThumbUp, description:'I like this post!', hidden:editMode, 
+            right:true, onClick:requestIncrementVoteScore
+          },
+          {
+            id:'thumbDown', icon:ThumbDown, description:'I don\'t like this post', 
+            hidden:editMode, right:true, onClick:requestDecrementVoteScore
+          },
+          {
+            id:'edit', icon:Edit, description:'Edit Post', hidden:editMode,
+            right:true, onClick: _ => this._changeEditMode(true)
+          },
+          {
+            id:'delete', icon:Delete, description:'Delete Post',hidden:editMode,
+            right:true, onClick:this._openDeleteDialog
+          },
         ]}
       >
       {editMode ? (
-        <form className={classes.container} noValidate autoComplete="off">
+        <form className={classes.formContainer}>
           <TextField
             fullWidth
+            required={requiredFields.includes('title')}
+            error={submitting && !values.title}
             id="title"
             label="Title"
             InputLabelProps={{shrink: true}}
             className={classes.textField}
             value={values.title}
-            onChange={this._handleChange('title')}
+            onChange={event => this._handleChange('title', event.target.value)}
             margin="dense"
           />
           <TextField
             fullWidth
-            id="author"
-            label="Author"
-            InputLabelProps={{shrink: true}}
-            className={classes.textField}
-            value={values.author}
-            onChange={this._handleChange('author')}
-            margin="dense"
-          />
-          <TextField
-            fullWidth
-            id="category"
-            select
-            label="Category"
-            className={classes.textField}
-            value={values.category}
-            onChange={this._handleChange('category')}
-            SelectProps={{native: true}}
-            margin="dense"
-          >
-            {categories.map(category => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-          </TextField>
-          <TextField
-            fullWidth
+            required={requiredFields.includes('body')}
+            error={submitting && !values.body}
             id="body"
             label="Body"
             InputLabelProps={{shrink: true}}
@@ -151,7 +213,7 @@ class PostDetail extends Component {
             rows="14"
             rowsMax="14"
             value={values.body}
-            onChange={this._handleChange('body')}
+            onChange={event => this._handleChange('body', event.target.value)}
             className={classes.textField}
             margin="dense"
           />
@@ -159,14 +221,49 @@ class PostDetail extends Component {
       ) : (
         <div className={classes.viewContainer}>
           <div className={classes.viewHeader}>
-            <div className={classes.viewAuthor}>{`by ${post.author}, in ${post.category} category`}</div>
+            <div className={classes.viewInfo}>
+              <IconButton tabIndex="-1" aria-label="Comments" disableRipple className={classes.iconButton}>
+                <Badge badgeContent={post.voteScore || 0} color="accent">
+                  <Stars />
+                </Badge>
+              </IconButton>
+              <div className={classes.viewAuthor}>{`by ${post.author}, in ${capitalize(post.category)} Category`}</div>
+            </div>
             <div className={classes.viewDate}>{timestampToHuman(post.timestamp)}</div>
           </div>
           <div className={classes.viewBody}>
-            {values.body}
+            {post.body}
           </div>
         </div>
       )}
+
+      <Dialog
+        open={this.state.showDeleteDialog}
+        transition={<Slide direction="up" />}
+        onRequestClose={this._closeDeleteDialog}
+      >
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this post?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={this._closeDeleteDialog} color="primary">
+            No
+          </Button>
+          <Button onClick={ _ => {
+              this._closeDeleteDialog()
+              this._deletePost()
+            }}
+            color="accent"
+            autoFocus
+          >
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+
       </HeaderLayout>
     )
   }
@@ -184,13 +281,32 @@ PostDetail.propTypes = {
   classes: PropTypes.object.isRequired
 }
 
-const mapStateToProps = ({ posts, categories }, ownProps) => ({ 
-  post: (posts.items[ownProps.categoryName] || []).find(post => 
-    post.id === ownProps.match.params.postId
-  ) || {},
-  categories: categories.items.map(category => category.name),
-  isFetchingPosts: posts.isFetching
-})
+const mapStateToProps = ({ posts, categories }, ownProps) => {
+  const { categoryName, match } = ownProps
+  const postId = match.params.postId
+  const categoryPosts = posts.items[categoryName] || {}
+  return {
+    post: categoryPosts[postId] || {},
+    categories: categories.items.map(category => category.name),
+    isFetchingPosts: posts.isFetching,
+    isUpdatingPosts: posts.isUpdating
+  }
+}
+
+const mapDispatchToProps = (dispatch, ownProps) => {
+  const { categoryName, match } = ownProps
+  const postId = match.params.postId
+  return {
+    requestDeletePost: _ =>
+      dispatch(requestDeletePost(categoryName, postId)),
+    requestUpdatePost: values =>
+      dispatch(requestUpdatePost(categoryName, postId, values)),
+    requestIncrementVoteScore: _ => 
+      dispatch(requestIncrementVoteScore(categoryName, postId)),
+    requestDecrementVoteScore: _ => 
+      dispatch(requestDecrementVoteScore(categoryName, postId))   
+  }
+}
 
 //https://github.com/reactjs/react-redux/blob/master/docs/troubleshooting.md#my-views-arent-updating
-export default connect(mapStateToProps, null, null, {pure:false})(withStyles(styles)(PostDetail))
+export default connect(mapStateToProps, mapDispatchToProps, null, {pure:false})(withStyles(styles)(PostDetail))

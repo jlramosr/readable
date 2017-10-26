@@ -20,15 +20,44 @@ export const getAPIPosts = _ =>
     .then(res => res.json())
     .then(data => data)
 
-export const addAPIPost = (body) =>
+export const addAPIPost = (post) =>
   fetch(`${api}/posts`, {
     method: 'POST',
     headers: {
       ...headers,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(body)
+    body: JSON.stringify(post)
   }).then(res => res.json())
+
+export const updateAPIPost = (postId, values) =>
+  fetch(`${api}/posts/${postId}`, {
+    method: 'PUT',
+    headers: {
+      ...headers,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(values)
+  })
+
+export const deleteAPIPost = (postId) =>
+  fetch(`${api}/posts/${postId}`, {
+    method: 'DELETE',
+    headers: {
+      ...headers,
+      'Content-Type': 'application/json'
+    }
+  })
+
+export const voteAPIPost = (postId, option) =>
+  fetch(`${api}/posts/${postId}`, {
+    method: 'POST',
+    headers: {
+      ...headers,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({option})
+  })
 
 export const remove = (contact) =>
   fetch(`${api}/contacts/${contact.id}`, { method: 'DELETE', headers })

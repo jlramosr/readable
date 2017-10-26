@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 import HeaderLayout from '../headerLayout'
 import { withStyles } from 'material-ui/styles'
 import ListSubheader from 'material-ui/List/ListSubheader'
@@ -9,17 +10,22 @@ import Dialog from 'material-ui/Dialog'
 import Badge from 'material-ui/Badge'
 import Divider from 'material-ui/Divider'
 import IconButton from 'material-ui/IconButton'
+import ThumbUp from 'material-ui-icons/ThumbUp'
+import ThumbDown from 'material-ui-icons/ThumbDown'
 import Stars from 'material-ui-icons/Stars'
+import Comment from 'material-ui-icons/Comment'
 import PostNew from '../category/postNew'
 import SortByAlpha from 'material-ui-icons/SortByAlpha'
 import DateRange from 'material-ui-icons/DateRange'
 import Favorite from 'material-ui-icons/Favorite'
 import Add from 'material-ui-icons/Add'
+import Tooltip from 'material-ui/Tooltip'
 import Slide from 'material-ui/transitions/Slide'
 import escapeRegExp from 'escape-string-regexp'
 import sortBy from "sort-by"
 import removeDiacritics from 'remove-diacritics'
-import { timestampToHuman } from '../../utils/helpers'
+import { requestIncrementVoteScore, requestDecrementVoteScore } from '../../actions/posts'
+import { timestampToHuman, capitalize } from '../../utils/helpers'
 
 const styles = theme => ({
   root: {
@@ -33,10 +39,20 @@ const styles = theme => ({
     color:'teal',
     cursor:'pointer',
     textDecoration: 'underline'
+  },
+  iconButton: {
+    width: 24,
+  },
+  badge: {
+    width: 18,
+    height: 18,
+    fontSize: 11,
+    right: -2,
+    top: 16
   }
 })
 
-class CustomList extends Component {
+class CustomPostsList extends Component {
   state = {
     activePosts: null,
     searchQuery: '',
@@ -54,7 +70,15 @@ class CustomList extends Component {
   _orderPosts = (posts, orderBy, orderDesc) =>
     posts.sort(sortBy(`${orderDesc ? '' : '-'}${orderBy}`))
 
-  updateSearchQuery = searchQuery => {
+  _thumbClicked = (event, which, post) => {
+    console.log("HOLA")
+    event.preventDefault()
+    which === 'up' ?
+      this.props.requestIncrementVoteScore(post.category, post.id) :
+      this.props.requestDecrementVoteScore(post.category, post.id)
+  }
+
+  updateSearchQuery = (searchQuery) => {
     const { posts } = this.props
     let activePosts = posts
     if (searchQuery) {
@@ -64,7 +88,7 @@ class CustomList extends Component {
         match.test(removeDiacritics(post.title))
       ))
     }
-    this.setState({ activePosts })
+    this.setState({ activePosts, searchQuery })
   }
 
   _updateOrder = orderBy => {
@@ -80,12 +104,26 @@ class CustomList extends Component {
       "contrast"
 
   componentWillReceiveProps = props => {
-    this.setState({activePosts: props.posts})
+    const { searchQuery } = this.state
+    if (searchQuery) {
+      this.updateSearchQuery(searchQuery)
+    } else {
+      this.setState({activePosts: props.posts})
+    }
   }
 
   render = _ => {
     const { activePosts, showNewDialog, orderBy, orderDesc } = this.state
-    const { title, loading, aditionalOperations, category, posts, postsReceived, classes } = this.props
+    const {
+      title,
+      loading,
+      aditionalOperations,
+      category,
+      posts,
+      postsReceived,
+      isUpdatingPosts,
+      classes 
+    } = this.props
 
     let subHeader = 'Posts'
     let _orderDesc = orderDesc
@@ -103,7 +141,7 @@ class CustomList extends Component {
       <HeaderLayout
         title={title}
         updateSearchQuery={posts.length ? this.updateSearchQuery : null}
-        loading={loading}
+        loading={loading || isUpdatingPosts}
         operations={[
           { 
             id:'sortByAlpha', icon:SortByAlpha, right:true, hidden: !posts.length,
@@ -112,17 +150,17 @@ class CustomList extends Component {
           },
           {
             id:'dateRange', icon:DateRange, right:true, hidden: !posts.length,
-            description:'More recents', onClick: _ => this._updateOrder('timestamp'),
+            description:'Order By Date', onClick: _ => this._updateOrder('timestamp'),
             color: this._getIconOrderColor('timestamp', orderBy, orderDesc)
           },
           {
             id:'favorite', icon:Favorite, right:true, hidden: !posts.length,
-            description:'Favorites', onClick: _ => this._updateOrder('voteScore'),
+            description:'Order By Votes', onClick: _ => this._updateOrder('voteScore'),
             color: this._getIconOrderColor('voteScore', orderBy, orderDesc)
           },
           { 
             id:'add', icon:Add, right:true, hidden: !posts.length,
-            description:'New Post', onClick:this._openNewDialog,
+            description:`New${category ? ` ${capitalize(category)} `: ' '}Post`, onClick:this._openNewDialog,
           },
           ...aditionalOperations
         ]}
@@ -140,20 +178,48 @@ class CustomList extends Component {
                 <div key={post.title}>
                   <Link key={post.id} to={`/${post.category}/${post.id}`}>
                     <ListItem button> 
+                      <Tooltip
+                        title="Votes"
+                        placement="left"
+                        disableTriggerTouch
+                        enterDelay={200}
+                        leaveDelay={0}
+                      >
+                        <IconButton tabIndex="-1" aria-label="Votes" disableRipple className={classes.iconButton}>
+                          <Badge badgeContent={post.voteScore} classes={{badge:classes.badge}} color="accent">
+                            <Stars />
+                          </Badge>
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip
+                        title="Comments"
+                        placement="left"
+                        disableTriggerTouch
+                        enterDelay={200}
+                        leaveDelay={0}
+                      >
+                        <IconButton tabIndex="-1" aria-label="Comments" disableRipple className={classes.iconButton}>
+                          <Badge badgeContent={post.commentCount} classes={{badge:classes.badge}} color="accent">
+                            <Comment />
+                          </Badge>
+                        </IconButton>
+                      </Tooltip>
                       <ListItemText
                         primary={post.title}
                         secondary={`${timestampToHuman(post.timestamp)}, by ${post.author}`}
                       />
+
                       <ListItemSecondaryAction>
-                        <IconButton aria-label="Votes">
-                          <Badge badgeContent={post.voteScore} color="accent">
-                            <Stars />
-                          </Badge>
+                        <IconButton tabIndex="-1" aria-label=":)" onClick={event => this._thumbClicked(event,'up',post)}>
+                          <ThumbUp />
+                        </IconButton>
+                        <IconButton tabIndex="-1" aria-label=":(" onClick={event => this._thumbClicked(event,'down',post)}>
+                          <ThumbDown />
                         </IconButton>
                       </ListItemSecondaryAction>
                     </ListItem>
                   </Link>
-                  <Divider />
+                  <Divider tabIndex="-1"/>
                 </div>
               ))}
             </List> 
@@ -178,7 +244,7 @@ class CustomList extends Component {
   }
 }
 
-CustomList.propTypes = {
+CustomPostsList.propTypes = {
   title: PropTypes.string.isRequired,
   posts: PropTypes.array.isRequired,
   postsReceived: PropTypes.bool.isRequired,
@@ -188,10 +254,21 @@ CustomList.propTypes = {
   classes: PropTypes.object.isRequired
 }
 
-CustomList.defaultProps = {
+CustomPostsList.defaultProps = {
   aditionalOperations: [],
   loading: false,
   title: '',
 }
 
-export default withStyles(styles)(CustomList)
+const mapStateToProps = ({ posts }) => ({
+  isUpdatingPosts: posts.isUpdating
+})
+
+const mapDispatchToProps = dispatch => ({
+  requestIncrementVoteScore: (categoryName, postId) => 
+    dispatch(requestIncrementVoteScore(categoryName, postId)),
+  requestDecrementVoteScore: (categoryName, postId) => 
+    dispatch(requestDecrementVoteScore(categoryName, postId))   
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(CustomPostsList))

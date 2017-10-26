@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import List from '../list'
+import List from '../list/posts'
 import ArrowBack from 'material-ui-icons/ArrowBack'
 
 class PostsList extends Component {
@@ -30,10 +30,12 @@ PostsList.propTypes = {
   postsReceived: PropTypes.bool.isRequired
 }
 
+const _getCategoryPosts = posts =>
+  Object.keys(posts).reduce( (accPosts, postId) => [...accPosts, {id:postId, ...posts[postId]}], [])
+
 const mapStateToProps = ({ posts }, ownProps) => {
-  //console.log(posts, ownProps)
   return {
-    posts: posts.items[ownProps.match.params.categoryName] || [],
+    posts: _getCategoryPosts(posts.items[ownProps.categoryName] || []).filter(post => !post.deleted),
     isFetchingPosts: posts.isFetching,
     postsReceived: posts.received
   }

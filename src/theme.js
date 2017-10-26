@@ -52,27 +52,34 @@ let theme = createMuiTheme({
           [`${theme.breakpoints.up('sm')}`]: {
             paddingTop: theme.spacing.unit,
             paddingBottom: theme.spacing.unit,
-            paddingLeft: theme.spacing.unit*12,
-            paddingRight: theme.spacing.unit*12,
+            paddingLeft: theme.spacing.unit*8,
+            paddingRight: theme.spacing.unit*8,
           },
           [`${theme.breakpoints.up('md')}`]: {
-            paddingLeft: theme.spacing.unit*24,
-            paddingRight: theme.spacing.unit*24,
+            paddingLeft: theme.spacing.unit*16,
+            paddingRight: theme.spacing.unit*16,
           },
           [`${theme.breakpoints.up('lg')}`]: {
-            paddingLeft: theme.spacing.unit*48,
-            paddingRight: theme.spacing.unit*48,
+            paddingLeft: theme.spacing.unit*32,
+            paddingRight: theme.spacing.unit*32,
           },
         },
       },
       MuiListItem: {
         root: {
-          outline: 'none',
-        },
+          outline: 'none'
+        }
+      },
+      MuiListItemText: {
+        root: {
+          padding: 0,
+          paddingRight: theme.spacing.unit*10,
+          paddingLeft: theme.spacing.unit*2
+        }
       },
       MuiListItemSecondaryAction: {
         root: {
-          right: 20
+          right: 10
         }
       }
     },
