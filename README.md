@@ -98,11 +98,11 @@ You can find the most recent version of this guide [here](https://github.com/fac
 
 ## API Server
 
-###Download or fork and clone the [starter server repository](https://github.com/udacity/reactnd-project-readable-starter)
+### Download or fork and clone the [starter server repository](https://github.com/udacity/reactnd-project-readable-starter)
 
-###Install the requirements from the included package.json file: `npm install`
+### Install the requirements from the included package.json file: `npm install`
 
-###Run the server with `node server`
+### Run the server with `node server`
 
 ## Updating to New Releases
 
