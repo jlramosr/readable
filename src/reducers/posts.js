@@ -4,8 +4,10 @@ import { REQUEST_UPDATE_POSTS } from '../actions/posts'
 import { ADD_POST } from '../actions/posts'
 import { UPDATE_POST } from '../actions/posts'
 import { DELETE_POST } from '../actions/posts'
-import { INCREMENT_VOTE_SCORE } from '../actions/posts'
-import { DECREMENT_VOTE_SCORE } from '../actions/posts'
+import { INCREMENT_POST_VOTE_SCORE } from '../actions/posts'
+import { DECREMENT_POST_VOTE_SCORE } from '../actions/posts'
+import { INCREMENT_COMMENTS_POST } from '../actions/posts'
+import { DECREMENT_COMMENTS_POST } from '../actions/posts'
 
 const initialPostsState = {
   isFetching: false,
@@ -87,8 +89,8 @@ const posts = (state = initialPostsState, action) => {
           }
         }
       }
-    case INCREMENT_VOTE_SCORE:
-    case DECREMENT_VOTE_SCORE:
+    case INCREMENT_POST_VOTE_SCORE:
+    case DECREMENT_POST_VOTE_SCORE:
       const { type, categoryName, postId } = action
       return {
         ...state,
@@ -100,7 +102,24 @@ const posts = (state = initialPostsState, action) => {
             [postId]: {
               ...state.items[categoryName][postId],
               voteScore: state.items[categoryName][postId].voteScore +
-                (type === INCREMENT_VOTE_SCORE ? 1 : (-1))
+                (type === INCREMENT_POST_VOTE_SCORE ? 1 : (-1))
+            }
+          }
+        }
+      }
+    case INCREMENT_COMMENTS_POST:
+    case DECREMENT_COMMENTS_POST:
+      return {
+        ...state,
+        isUpdating: false,
+        items: {
+          ...state.items,
+          [action.categoryName]: {
+            ...state.items[action.categoryName],
+            [action.postId]: {
+              ...state.items[action.categoryName][action.postId],
+              commentCount: state.items[action.categoryName][action.postId].commentCount +
+                (action.type === INCREMENT_COMMENTS_POST ? 1 : (-1))
             }
           }
         }

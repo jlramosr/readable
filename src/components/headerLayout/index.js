@@ -16,8 +16,7 @@ const styles = theme => ({
   toolbar: {
     overflow: 'hidden',
     width: '100%',
-    flex: '0 0 auto',
-    paddingRight: 0
+    flex: '0 0 auto'
   },
   content: {
     flex: '1 1 auto',
@@ -45,7 +44,8 @@ const HeaderLayout = props => {
         className={classes.toolbar}
         style={relative ? 
           {position:'relative', zIndex: theme.zIndex.appBar} :
-          {position:'fixed', zIndex: theme.zIndex.appBar+1}}
+          {position:'fixed', zIndex: theme.zIndex.appBar+1}
+        }
       >
         <CustomToolbar {...rest}/>
       </div>
@@ -54,6 +54,7 @@ const HeaderLayout = props => {
         style={relative ? {
           marginTop: 0,
           maxHeight: relativeHeight,
+          height: 'inherit',
         } : {
         }}
       >

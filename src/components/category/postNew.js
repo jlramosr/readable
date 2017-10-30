@@ -33,7 +33,12 @@ const requiredFields = [
 class PostNew extends Component {
   state = {
     submitting: false,
-    values: {}
+    values: {
+      title: '',
+      body: '',
+      author: '',
+      category: ''
+    }
   }
 
 

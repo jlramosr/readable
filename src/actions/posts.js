@@ -13,8 +13,10 @@ export const REQUEST_UPDATE_POSTS = 'REQUEST_UPDATE_POSTS'
 export const ADD_POST = 'ADD_POST'
 export const UPDATE_POST = 'UPDATE_POST'
 export const DELETE_POST = 'DELETE_POST'
-export const INCREMENT_VOTE_SCORE = 'INCREMENT_VOTE_SCORE'
-export const DECREMENT_VOTE_SCORE = 'DECREMENT_VOTE_SCORE'
+export const INCREMENT_POST_VOTE_SCORE = 'INCREMENT_POST_VOTE_SCORE'
+export const DECREMENT_POST_VOTE_SCORE = 'DECREMENT_POST_VOTE_SCORE'
+export const INCREMENT_COMMENTS_POST = 'INCREMENT_COMMENTS_POST'
+export const DECREMENT_COMMENTS_POST = 'DECREMENT_COMMENTS_POST'
 
 export const requestPosts = _ => ({
   type: REQUEST_POSTS
@@ -84,7 +86,7 @@ export const requestDeletePost = (categoryName, postId) => (dispatch, getState) 
 }
 
 export const incrementVoteScore = (categoryName, postId) => ({
-  type: INCREMENT_VOTE_SCORE,
+  type: INCREMENT_POST_VOTE_SCORE,
   categoryName,
   postId
 }) 
@@ -98,7 +100,7 @@ export const requestIncrementVoteScore = (categoryName, postId) => (dispatch, ge
 }
 
 export const decrementVoteScore = (categoryName, postId) => ({
-  type: DECREMENT_VOTE_SCORE,
+  type: DECREMENT_POST_VOTE_SCORE,
   categoryName,
   postId
 }) 
@@ -110,4 +112,16 @@ export const requestDecrementVoteScore = (categoryName, postId) => (dispatch, ge
     error => console.log("ERROR", error)
   )
 }
+
+export const incrementCommentsPost = (categoryName, postId) => ({
+  type: INCREMENT_COMMENTS_POST,
+  categoryName,
+  postId
+})
+
+export const decrementCommentsPost = (categoryName, postId) => ({
+  type: DECREMENT_COMMENTS_POST,
+  categoryName,
+  postId
+})
 

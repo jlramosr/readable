@@ -2,9 +2,11 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import HeaderLayout from '../headerLayout'
+import CommentsList from '../list/comments'
 import { withStyles } from 'material-ui/styles'
 import TextField from 'material-ui/TextField'
 import Badge from 'material-ui/Badge'
+import Paper from 'material-ui/Paper'
 import IconButton from 'material-ui/IconButton'
 import Stars from 'material-ui-icons/Stars'
 import Close from 'material-ui-icons/Close'
@@ -20,6 +22,7 @@ import {
   requestIncrementVoteScore,
   requestDecrementVoteScore
 } from '../../actions/posts'
+import { fetchComments } from '../../actions/comments'
 import Button from 'material-ui/Button'
 import Dialog, { DialogActions, DialogContent, DialogContentText } from 'material-ui/Dialog'
 import Slide from 'material-ui/transitions/Slide'
@@ -59,6 +62,10 @@ const styles = theme => ({
     padding: theme.spacing.unit,
     display: 'flex',
     flex: '1 1 auto'
+  },
+  viewComments: {
+    order: 3,
+    marginTop: theme.spacing.unit*3
   },
   viewInfo: {
     color: theme.palette.secondary[700],
@@ -143,14 +150,20 @@ class PostDetail extends Component {
     this.setState({values: {...props.post}})
   }
 
+  componentDidMount = _ => this.props.fetchComments()
+
   render = _ => {
     const {
       categoryName,
       post,
+      comments,
+      commentsReceived,
       isFetchingPosts,
+      isFetchingComments,
       isUpdatingPosts,
       requestIncrementVoteScore,
       requestDecrementVoteScore,
+      match,
       classes
     } = this.props
     const { editMode, submitting, values } = this.state
@@ -220,6 +233,7 @@ class PostDetail extends Component {
         </form>
       ) : (
         <div className={classes.viewContainer}>
+
           <div className={classes.viewHeader}>
             <div className={classes.viewInfo}>
               <IconButton tabIndex="-1" aria-label="Comments" disableRipple className={classes.iconButton}>
@@ -231,9 +245,21 @@ class PostDetail extends Component {
             </div>
             <div className={classes.viewDate}>{timestampToHuman(post.timestamp)}</div>
           </div>
+
           <div className={classes.viewBody}>
             {post.body}
           </div>
+
+          <Paper className={classes.viewComments}>
+            <CommentsList
+              comments={comments}
+              commentsReceived={commentsReceived}
+              loading={isFetchingComments}
+              title="Comments"
+              postId={match.params.postId}
+              categoryName={categoryName}
+            />
+          </Paper>
         </div>
       )}
 
@@ -278,17 +304,29 @@ PostDetail.propTypes = {
   post: PropTypes.object.isRequired,
   categoryName: PropTypes.string.isRequired,
   categories: PropTypes.array.isRequired,
+  comments: PropTypes.array.isRequired,
+  commentsReceived: PropTypes.bool.isRequired,
+  isFetchingPosts: PropTypes.bool.isRequired,
+  isFetchingComments: PropTypes.bool.isRequired,
+  isUpdatingPosts: PropTypes.bool.isRequired,
   classes: PropTypes.object.isRequired
 }
 
-const mapStateToProps = ({ posts, categories }, ownProps) => {
+const _getComments = comments =>
+  Object.keys(comments || {}).reduce( (accComments, commentId) => 
+    [...accComments, {id:commentId, ...comments[commentId]}], [])
+
+const mapStateToProps = ({ posts, categories, comments }, ownProps) => {
   const { categoryName, match } = ownProps
   const postId = match.params.postId
   const categoryPosts = posts.items[categoryName] || {}
   return {
     post: categoryPosts[postId] || {},
     categories: categories.items.map(category => category.name),
+    comments: _getComments(comments.items[postId]).filter(comment => !comment.deleted),
+    commentsReceived: comments.received,
     isFetchingPosts: posts.isFetching,
+    isFetchingComments: comments.isFetching,
     isUpdatingPosts: posts.isUpdating
   }
 }
@@ -297,6 +335,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   const { categoryName, match } = ownProps
   const postId = match.params.postId
   return {
+    fetchComments: _ =>
+      dispatch(fetchComments(postId)),
     requestDeletePost: _ =>
       dispatch(requestDeletePost(categoryName, postId)),
     requestUpdatePost: values =>

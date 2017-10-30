@@ -4,6 +4,7 @@ import thunk from 'redux-thunk'
 import logger from 'redux-logger'
 import categoriesReducer from './reducers/categories'
 import postsReducer from './reducers/posts'
+import commentsReducer from './reducers/comments'
 import drawerReducer from './reducers/drawer'
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
@@ -13,6 +14,7 @@ export default createStore(
     router: routerReducer,
     categories: categoriesReducer,
     posts: postsReducer,
+    comments: commentsReducer,
     drawer: drawerReducer
   }),
   composeEnhancers(

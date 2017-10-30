@@ -22,7 +22,7 @@ import Add from 'material-ui-icons/Add'
 import Tooltip from 'material-ui/Tooltip'
 import Slide from 'material-ui/transitions/Slide'
 import escapeRegExp from 'escape-string-regexp'
-import sortBy from "sort-by"
+import sortBy from 'sort-by'
 import removeDiacritics from 'remove-diacritics'
 import { requestIncrementVoteScore, requestDecrementVoteScore } from '../../actions/posts'
 import { timestampToHuman, capitalize } from '../../utils/helpers'
@@ -71,20 +71,19 @@ class CustomPostsList extends Component {
     posts.sort(sortBy(`${orderDesc ? '' : '-'}${orderBy}`))
 
   _thumbClicked = (event, which, post) => {
-    console.log("HOLA")
     event.preventDefault()
     which === 'up' ?
       this.props.requestIncrementVoteScore(post.category, post.id) :
       this.props.requestDecrementVoteScore(post.category, post.id)
   }
 
-  updateSearchQuery = (searchQuery) => {
-    const { posts } = this.props
-    let activePosts = posts
+  updateSearchQuery = (searchQuery, posts = null) => {
+    const _posts = posts || this.props.posts
+    let activePosts = _posts
     if (searchQuery) {
       const cleanQuery = removeDiacritics(searchQuery.trim())
       const match = new RegExp(escapeRegExp(cleanQuery), 'i')
-      activePosts = posts.filter(post => (
+      activePosts = _posts.filter(post => (
         match.test(removeDiacritics(post.title))
       ))
     }
@@ -103,14 +102,8 @@ class CustomPostsList extends Component {
       (orderDesc ? "default" : "accent") :
       "contrast"
 
-  componentWillReceiveProps = props => {
-    const { searchQuery } = this.state
-    if (searchQuery) {
-      this.updateSearchQuery(searchQuery)
-    } else {
-      this.setState({activePosts: props.posts})
-    }
-  }
+  componentWillReceiveProps = props =>
+    this.updateSearchQuery(this.state.searchQuery, props.posts)
 
   render = _ => {
     const { activePosts, showNewDialog, orderBy, orderDesc } = this.state
@@ -175,7 +168,7 @@ class CustomPostsList extends Component {
               subheader={<ListSubheader>{subHeader}</ListSubheader>}
             >
               {showingPosts.map(post => (
-                <div key={post.title}>
+                <div key={post.id}>
                   <Link key={post.id} to={`/${post.category}/${post.id}`}>
                     <ListItem button> 
                       <Tooltip
@@ -225,7 +218,7 @@ class CustomPostsList extends Component {
             </List> 
           ) : (
             <div style={{padding: 20}}>
-              There is no posts yet. Create the firts one <span className={classes.noPostsText} onClick={this._openNewDialog}>here</span>
+              There is no posts yet. Create the firt one <span className={classes.noPostsText} onClick={this._openNewDialog}>here</span>
             </div>
           )
         )}

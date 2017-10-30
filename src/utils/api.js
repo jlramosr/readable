@@ -20,6 +20,11 @@ export const getAPIPosts = _ =>
     .then(res => res.json())
     .then(data => data)
 
+  export const getAPIComments = postId =>
+  fetch(`${api}/posts/${postId}/comments`, { headers })
+    .then(res => res.json())
+    .then(data => data)
+
 export const addAPIPost = (post) =>
   fetch(`${api}/posts`, {
     method: 'POST',
@@ -40,7 +45,7 @@ export const updateAPIPost = (postId, values) =>
     body: JSON.stringify(values)
   })
 
-export const deleteAPIPost = (postId) =>
+export const deleteAPIPost = postId =>
   fetch(`${api}/posts/${postId}`, {
     method: 'DELETE',
     headers: {
@@ -59,7 +64,41 @@ export const voteAPIPost = (postId, option) =>
     body: JSON.stringify({option})
   })
 
-export const remove = (contact) =>
-  fetch(`${api}/contacts/${contact.id}`, { method: 'DELETE', headers })
-    .then(res => res.json())
-    .then(data => data.contact)
+export const addAPIComment = comment =>
+  fetch(`${api}/comments`, {
+    method: 'POST',
+    headers: {
+      ...headers,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(comment)
+  }).then(res => res.json())
+
+export const updateAPIComment = (commentId, values) =>
+  fetch(`${api}/comments/${commentId}`, {
+    method: 'PUT',
+    headers: {
+      ...headers,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(values)
+  })
+
+export const deleteAPIComment = commentId =>
+  fetch(`${api}/comments/${commentId}`, {
+    method: 'DELETE',
+    headers: {
+      ...headers,
+      'Content-Type': 'application/json'
+    }
+  })
+
+export const voteAPIComment = (postId, option) =>
+  fetch(`${api}/comments/${postId}`, {
+    method: 'POST',
+    headers: {
+      ...headers,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({option})
+  })

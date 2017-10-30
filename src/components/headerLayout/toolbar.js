@@ -19,6 +19,9 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'flex-start'
   },
+  noLeftOperations: {
+    width: 12,
+  },
   title: {
     order: 2,
     height: '100%',
@@ -152,13 +155,15 @@ class CustomToolbar extends Component {
 
     const miniToolbarHeight = 40
 
+    const leftOperations = operations.filter(operation => !operation.right)
+
     return (
       <AppBar
         className={classes.root}
         style={
           miniToolbar ? {
             height: miniToolbarHeight,
-            background: theme.palette.secondary[700],
+            background: theme.palette.secondary[50],
           } : {
           }
         }
@@ -170,11 +175,13 @@ class CustomToolbar extends Component {
           } : { 
         }}>
 
-          <div className={classes.leftOperations}>
-            {React.createElement(Operations, {
-              operations: operations.filter(operation => !operation.right)
-            })}
-          </div>
+          {leftOperations.length ? (
+            <div className={classes.leftOperations}>
+              {React.createElement(Operations, {operations: leftOperations})}
+            </div>
+          ) : (
+            <div className={classes.noLeftOperations}></div>
+          )}
           
 
           <div className={classes.title}>
