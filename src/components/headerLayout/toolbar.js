@@ -163,7 +163,7 @@ class CustomToolbar extends Component {
         style={
           miniToolbar ? {
             height: miniToolbarHeight,
-            background: theme.palette.secondary[50],
+            background: theme.palette.secondary[700],
           } : {
           }
         }

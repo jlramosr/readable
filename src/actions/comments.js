@@ -14,6 +14,7 @@ export const REQUEST_UPDATE_COMMENTS = 'REQUEST_UPDATE_COMMENTS'
 export const ADD_COMMENT = 'ADD_COMMENT'
 export const UPDATE_COMMENT = 'UPDATE_COMMENT'
 export const DELETE_COMMENT = 'DELETE_COMMENT'
+export const DELETE_CASCADE_COMMENTS = 'DELETE_CASCADE_COMMENTS'
 export const INCREMENT_COMMENT_VOTE_SCORE = 'INCREMENT_COMMENT_VOTE_SCORE'
 export const DECREMENT_COMMENT_VOTE_SCORE = 'DECREMENT_COMMENT_VOTE_SCORE'
 
@@ -80,6 +81,11 @@ export const deleteComment = (postId, commentId) => ({
   type: DELETE_COMMENT,
   postId,
   commentId
+})
+
+export const deleteCascadeComments = (postId) => ({
+  type: DELETE_CASCADE_COMMENTS,
+  postId
 })
 
 export const requestDeleteComment = (categoryName, postId, commentId) => (dispatch, getState) => {

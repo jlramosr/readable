@@ -6,6 +6,7 @@ import {
   voteAPIPost 
 } from '../utils/api'
 import uuid from 'uuid'
+import { deleteCascadeComments } from './comments'
 
 export const REQUEST_POSTS = 'REQUEST_POSTS'
 export const RECEIVE_POSTS = 'RECEIVE_POSTS'
@@ -80,7 +81,10 @@ export const deletePost = (categoryName, postId) => ({
 export const requestDeletePost = (categoryName, postId) => (dispatch, getState) => {
   dispatch(requestUpdatePosts())
   return deleteAPIPost(postId).then(
-    _ => dispatch(deletePost(categoryName, postId)),
+    _ => { 
+      dispatch(deletePost(categoryName, postId))
+      dispatch(deleteCascadeComments(postId))
+    },
     error => console.log("ERROR", error)
   )
 }

@@ -1,6 +1,6 @@
 {
   "name": "readable",
-  "version": "0.2.1",
+  "version": "1.0.0",
   "author": "Jose Ramos <jlramosr@gmail.com> (http://joseramos.info)",
   "private": true,
   "dependencies": {

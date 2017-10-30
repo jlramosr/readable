@@ -4,6 +4,7 @@ import { REQUEST_UPDATE_COMMENTS } from '../actions/comments'
 import { ADD_COMMENT } from '../actions/comments'
 import { UPDATE_COMMENT } from '../actions/comments'
 import { DELETE_COMMENT } from '../actions/comments'
+import { DELETE_CASCADE_COMMENTS } from '../actions/comments'
 import { INCREMENT_COMMENT_VOTE_SCORE } from '../actions/comments'
 import { DECREMENT_COMMENT_VOTE_SCORE } from '../actions/comments'
 
@@ -85,6 +86,21 @@ const comments = (state = initialCommentsState, action) => {
               deleted: true
             }
           }
+        }
+      }
+      case DELETE_CASCADE_COMMENTS:
+      return {
+        ...state,
+        isUpdating: false,
+        items: {
+          ...state.items,
+          [action.postId]: 
+            Object.keys(state.items[action.postId] || {}).reduce((acc,commentId) => ({
+              ...acc, [commentId]: {
+                ...state.items[action.postId][commentId],
+                parentDeleted:true
+              }
+            }),{})
         }
       }
     case INCREMENT_COMMENT_VOTE_SCORE:

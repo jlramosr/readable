@@ -18,6 +18,6 @@ export default createStore(
     drawer: drawerReducer
   }),
   composeEnhancers(
-    applyMiddleware(thunk, routerMiddleware(history))
+    applyMiddleware(thunk, logger, routerMiddleware(history))
   )
 )

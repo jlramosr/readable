@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import NotFound from '../notFound'
 import HeaderLayout from '../headerLayout'
 import CommentsList from '../list/comments'
 import { withStyles } from 'material-ui/styles'
@@ -156,11 +157,13 @@ class PostDetail extends Component {
     const {
       categoryName,
       post,
+      postsReceived,
       comments,
       commentsReceived,
       isFetchingPosts,
       isFetchingComments,
       isUpdatingPosts,
+      isUpdatingComments,
       requestIncrementVoteScore,
       requestDecrementVoteScore,
       match,
@@ -169,128 +172,136 @@ class PostDetail extends Component {
     const { editMode, submitting, values } = this.state
 
     return (
-      <HeaderLayout
-        title={post.title}
-        loading={isFetchingPosts || isUpdatingPosts}
-        operations={[
-          {
-            id:'arrowBack', icon:ArrowBack, hidden:editMode, to:`/${categoryName}`
-          },
-          {
-            id:'close', icon:Close, hidden:!editMode, onClick: _ => this._changeEditMode(false)
-          },
-          {
-            id:'check', icon:Check, description: 'Save', hidden:!editMode, 
-            right:true, onClick:this._submit
-          },
-          {
-            id:'thumbUp', icon:ThumbUp, description:'I like this post!', hidden:editMode, 
-            right:true, onClick:requestIncrementVoteScore
-          },
-          {
-            id:'thumbDown', icon:ThumbDown, description:'I don\'t like this post', 
-            hidden:editMode, right:true, onClick:requestDecrementVoteScore
-          },
-          {
-            id:'edit', icon:Edit, description:'Edit Post', hidden:editMode,
-            right:true, onClick: _ => this._changeEditMode(true)
-          },
-          {
-            id:'delete', icon:Delete, description:'Delete Post',hidden:editMode,
-            right:true, onClick:this._openDeleteDialog
-          },
-        ]}
-      >
-      {editMode ? (
-        <form className={classes.formContainer}>
-          <TextField
-            fullWidth
-            required={requiredFields.includes('title')}
-            error={submitting && !values.title}
-            id="title"
-            label="Title"
-            InputLabelProps={{shrink: true}}
-            className={classes.textField}
-            value={values.title}
-            onChange={event => this._handleChange('title', event.target.value)}
-            margin="dense"
-          />
-          <TextField
-            fullWidth
-            required={requiredFields.includes('body')}
-            error={submitting && !values.body}
-            id="body"
-            label="Body"
-            InputLabelProps={{shrink: true}}
-            multiline
-            rows="14"
-            rowsMax="14"
-            value={values.body}
-            onChange={event => this._handleChange('body', event.target.value)}
-            className={classes.textField}
-            margin="dense"
-          />
-        </form>
-      ) : (
-        <div className={classes.viewContainer}>
-
-          <div className={classes.viewHeader}>
-            <div className={classes.viewInfo}>
-              <IconButton tabIndex="-1" aria-label="Comments" disableRipple className={classes.iconButton}>
-                <Badge badgeContent={post.voteScore || 0} color="accent">
-                  <Stars />
-                </Badge>
-              </IconButton>
-              <div className={classes.viewAuthor}>{`by ${post.author}, in ${capitalize(post.category)} Category`}</div>
-            </div>
-            <div className={classes.viewDate}>{timestampToHuman(post.timestamp)}</div>
-          </div>
-
-          <div className={classes.viewBody}>
-            {post.body}
-          </div>
-
-          <Paper className={classes.viewComments}>
-            <CommentsList
-              comments={comments}
-              commentsReceived={commentsReceived}
-              loading={isFetchingComments}
-              title="Comments"
-              postId={match.params.postId}
-              categoryName={categoryName}
-            />
-          </Paper>
-        </div>
-      )}
-
-      <Dialog
-        open={this.state.showDeleteDialog}
-        transition={<Slide direction="up" />}
-        onRequestClose={this._closeDeleteDialog}
-      >
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to delete this post?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={this._closeDeleteDialog} color="primary">
-            No
-          </Button>
-          <Button onClick={ _ => {
-              this._closeDeleteDialog()
-              this._deletePost()
-            }}
-            color="accent"
-            autoFocus
+      postsReceived ? (
+        Object.keys(post).length > 0 ? (
+          <HeaderLayout
+            title={post.title}
+            loading={isFetchingPosts || isUpdatingPosts}
+            operations={[
+              {
+                id:'arrowBack', icon:ArrowBack, hidden:editMode, to:`/${categoryName}`
+              },
+              {
+                id:'close', icon:Close, hidden:!editMode, onClick: _ => this._changeEditMode(false)
+              },
+              {
+                id:'check', icon:Check, description: 'Save', hidden:!editMode, 
+                right:true, onClick:this._submit
+              },
+              {
+                id:'thumbUp', icon:ThumbUp, description:'I like this post!', hidden:editMode, 
+                right:true, onClick:requestIncrementVoteScore
+              },
+              {
+                id:'thumbDown', icon:ThumbDown, description:'I don\'t like this post', 
+                hidden:editMode, right:true, onClick:requestDecrementVoteScore
+              },
+              {
+                id:'edit', icon:Edit, description:'Edit Post', hidden:editMode,
+                right:true, onClick: _ => this._changeEditMode(true)
+              },
+              {
+                id:'delete', icon:Delete, description:'Delete Post',hidden:editMode,
+                right:true, onClick:this._openDeleteDialog
+              },
+            ]}
           >
-            Yes
-          </Button>
-        </DialogActions>
-      </Dialog>
+          {editMode ? (
+            <form className={classes.formContainer}>
+              <TextField
+                fullWidth
+                required={requiredFields.includes('title')}
+                error={submitting && !values.title}
+                id="title"
+                label="Title"
+                InputLabelProps={{shrink: true}}
+                className={classes.textField}
+                value={values.title}
+                onChange={event => this._handleChange('title', event.target.value)}
+                margin="dense"
+              />
+              <TextField
+                fullWidth
+                required={requiredFields.includes('body')}
+                error={submitting && !values.body}
+                id="body"
+                label="Body"
+                InputLabelProps={{shrink: true}}
+                multiline
+                rows="14"
+                rowsMax="14"
+                value={values.body}
+                onChange={event => this._handleChange('body', event.target.value)}
+                className={classes.textField}
+                margin="dense"
+              />
+            </form>
+          ) : (
+            <div className={classes.viewContainer}>
+
+              <div className={classes.viewHeader}>
+                <div className={classes.viewInfo}>
+                  <IconButton tabIndex="-1" aria-label="Comments" disableRipple className={classes.iconButton}>
+                    <Badge badgeContent={post.voteScore || 0} color="accent">
+                      <Stars />
+                    </Badge>
+                  </IconButton>
+                  <div className={classes.viewAuthor}>{`by ${post.author}, in ${capitalize(post.category)} Category`}</div>
+                </div>
+                <div className={classes.viewDate}>{timestampToHuman(post.timestamp)}</div>
+              </div>
+
+              <div className={classes.viewBody}>
+                {post.body}
+              </div>
+
+              <Paper className={classes.viewComments}>
+                <CommentsList
+                  comments={comments}
+                  commentsReceived={commentsReceived}
+                  loading={isFetchingComments || isUpdatingComments}
+                  title="Comments"
+                  postId={match.params.postId}
+                  categoryName={categoryName}
+                />
+              </Paper>
+            </div>
+          )}
+
+          <Dialog
+            open={this.state.showDeleteDialog}
+            transition={<Slide direction="up" />}
+            onRequestClose={this._closeDeleteDialog}
+          >
+            <DialogContent>
+              <DialogContentText>
+                Are you sure you want to delete this post?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this._closeDeleteDialog} color="primary">
+                No
+              </Button>
+              <Button onClick={ _ => {
+                  this._closeDeleteDialog()
+                  this._deletePost()
+                }}
+                color="accent"
+                autoFocus
+              >
+                Yes
+              </Button>
+            </DialogActions>
+          </Dialog>
 
 
-      </HeaderLayout>
+          </HeaderLayout>
+        ) : (
+          <NotFound text="Post Not Found" />
+        )
+      ) : (
+        <NotFound text="Loading Post ..." />
+      )
     )
   }
 }
@@ -302,6 +313,7 @@ PostDetail.propTypes = {
     })
   }),
   post: PropTypes.object.isRequired,
+  postsReceived: PropTypes.bool.isRequired,
   categoryName: PropTypes.string.isRequired,
   categories: PropTypes.array.isRequired,
   comments: PropTypes.array.isRequired,
@@ -309,6 +321,7 @@ PostDetail.propTypes = {
   isFetchingPosts: PropTypes.bool.isRequired,
   isFetchingComments: PropTypes.bool.isRequired,
   isUpdatingPosts: PropTypes.bool.isRequired,
+  isUpdatingComments: PropTypes.bool.isRequired,
   classes: PropTypes.object.isRequired
 }
 
@@ -322,12 +335,14 @@ const mapStateToProps = ({ posts, categories, comments }, ownProps) => {
   const categoryPosts = posts.items[categoryName] || {}
   return {
     post: categoryPosts[postId] || {},
+    postsReceived: posts.received,
     categories: categories.items.map(category => category.name),
     comments: _getComments(comments.items[postId]).filter(comment => !comment.deleted),
     commentsReceived: comments.received,
     isFetchingPosts: posts.isFetching,
     isFetchingComments: comments.isFetching,
-    isUpdatingPosts: posts.isUpdating
+    isUpdatingPosts: posts.isUpdating,
+    isUpdatingComments: comments.isUpdating
   }
 }
 

@@ -1,5 +1,5 @@
 import { createMuiTheme } from 'material-ui/styles'
-import indigo from 'material-ui/colors/indigo'
+import blue from 'material-ui/colors/blue'
 import amber from 'material-ui/colors/amber'
 import red from 'material-ui/colors/red'
 import grey from 'material-ui/colors/grey'
@@ -7,10 +7,10 @@ import grey from 'material-ui/colors/grey'
 let theme = createMuiTheme({
     standards: {
       colors: {
-        primary: grey,
-        secondary: indigo,
+        primary: blue,
+        secondary: amber,
         error: red,
-        grey: amber
+        grey: grey
       },
       toolbarHeights: {
         mobilePortrait: 56,
